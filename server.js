@@ -90,13 +90,13 @@ function getSession(request) {
     }
 
     const token = cookie.trim().slice('transcript_session='.length);
-    const expiresAt = sessions.get(token);
-    if (!expiresAt || expiresAt < Date.now()) {
+    const session = sessions.get(token);
+    if (!session || session.expiresAt < Date.now()) {
         sessions.delete(token);
         return false;
     }
-    sessions.set(token, Date.now() + sessionLifetime);
-    return true;
+    session.expiresAt = Date.now() + sessionLifetime;
+    return session;
 }
 
 function download(response, content, contentType, filename) {
@@ -174,13 +174,6 @@ async function handleRequest(request, response) {
     }
 
     if (url.pathname === '/api/login' && request.method === 'POST') {
-        const expectedUsername = process.env.TRANSCRIPT_USERNAME;
-        const expectedPassword = process.env.TRANSCRIPT_PASSWORD;
-        if (!expectedUsername || !expectedPassword) {
-            sendJson(response, 503, { message: 'Download sign-in has not been configured.' });
-            return;
-        }
-
         let credentials;
         try {
             credentials = await readJson(request);
@@ -188,14 +181,15 @@ async function handleRequest(request, response) {
             sendJson(response, 400, { message: 'Invalid sign-in request.' });
             return;
         }
-        if (!constantTimeEqual(credentials.username, expectedUsername) ||
-            !constantTimeEqual(credentials.password, expectedPassword)) {
+        const student = getStudentProfile(credentials.username);
+        const expectedPassword = process.env.TRANSCRIPT_PASSWORD || 'password';
+        if (!student || !constantTimeEqual(credentials.password, expectedPassword)) {
             sendJson(response, 401, { message: 'Incorrect username or password.' });
             return;
         }
 
         const token = crypto.randomBytes(32).toString('hex');
-        sessions.set(token, Date.now() + sessionLifetime);
+        sessions.set(token, { username: student.registry, expiresAt: Date.now() + sessionLifetime });
         const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
         response.writeHead(200, {
             'Cache-Control': 'no-store',
@@ -207,8 +201,23 @@ async function handleRequest(request, response) {
         return;
     }
 
+    if (url.pathname === '/api/session' && request.method === 'GET') {
+        const profile = getStudentProfile(url.searchParams.get('register'));
+        if (!profile) {
+            sendJson(response, 404, { message: 'No matching student record was found.' });
+            return;
+        }
+
+        const session = getSession(request);
+        sendJson(response, 200, {
+            signedIn: Boolean(session && normalizeRegistry(session.username) === normalizeRegistry(profile.registry))
+        });
+        return;
+    }
+
     if (url.pathname === '/api/transcript' && request.method === 'GET') {
-        if (!getSession(request)) {
+        const session = getSession(request);
+        if (!session) {
             sendJson(response, 401, { message: 'Sign-in is required to download a transcript.' });
             return;
         }
@@ -216,6 +225,10 @@ async function handleRequest(request, response) {
         const profile = getStudentProfile(url.searchParams.get('register'));
         if (!profile) {
             sendJson(response, 404, { message: 'No matching student record was found.' });
+            return;
+        }
+        if (normalizeRegistry(session.username) !== normalizeRegistry(profile.registry)) {
+            sendJson(response, 403, { message: 'This login is only authorized for its matching register number.' });
             return;
         }
 

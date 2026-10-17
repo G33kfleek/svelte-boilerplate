@@ -405,6 +405,10 @@ $yellow-dark: #846000;
   font-weight: 600;
 }
 
+.document-name--signed-in {
+  color: $red;
+}
+
 .download-button {
   display: inline-flex;
   min-height: 40px;

@@ -116,23 +116,25 @@ npm install
 npm run build
 ```
 
-Configure the download login using environment variables, then start the server:
+The sign-in username is the student's exact register number. The default password is `password`; set `TRANSCRIPT_PASSWORD` to a private value before deployment. A successful session is limited to downloads for that student's register number.
+
+Set the production password through the environment, then start the server:
 
 ```sh
-TRANSCRIPT_USERNAME=registrar TRANSCRIPT_PASSWORD='replace-with-a-secret' NODE_ENV=production npm start
+TRANSCRIPT_PASSWORD='replace-with-a-secret' NODE_ENV=production npm start
 ```
 
 For local development, run the API and frontend in separate terminals. The API listens on port 3001 and the webpack dev server proxies `/api` requests to it on port 3000:
 
 ```sh
-TRANSCRIPT_USERNAME=registrar TRANSCRIPT_PASSWORD='replace-with-a-secret' npm start
+TRANSCRIPT_PASSWORD='replace-with-a-secret' npm start
 ```
 
 ```sh
 npm run start:dev
 ```
 
-Keep the login credentials in deployment secrets, never in the repository. The register profile is visible to anyone who knows its register number; sign-in protects transcript downloads only.
+Keep the production password in deployment secrets, never in the repository. The register profile is visible to anyone who knows its register number; sign-in protects transcript downloads only.
 
 ## License
 

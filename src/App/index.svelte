@@ -16,6 +16,7 @@
     let downloadMessage = '';
     let username = '';
     let password = '';
+    let signedIn = false;
     let pendingFormat = 'pdf';
     let scannerSupported = false;
     let scanning = false;
@@ -46,6 +47,7 @@
         registryValue = registry;
         if (!registry) {
             profile = null;
+            signedIn = false;
             verificationUrl = '';
             verificationPath = '';
             verificationQr = '';
@@ -55,6 +57,7 @@
 
         lookingUp = true;
         profile = null;
+        signedIn = false;
         verificationUrl = '';
         verificationPath = '';
         verificationQr = '';
@@ -68,6 +71,14 @@
                 return;
             }
             profile = result.profile;
+            try {
+                const sessionResponse = await fetch(`/api/session?register=${encodeURIComponent(result.profile.registry)}`);
+                if (sessionResponse.ok) {
+                    signedIn = (await sessionResponse.json()).signedIn;
+                }
+            } catch (error) {
+                signedIn = false;
+            }
             verificationUrl = createVerificationUrl(window.location.origin, result.profile.registry);
             verificationPath = new URL(verificationUrl).pathname;
             try {
@@ -96,8 +107,11 @@
         try {
             const query = new URLSearchParams({ register: registryValue, format });
             const response = await fetch(`/api/transcript?${query.toString()}`);
-            if (response.status === 401) {
+            if (response.status === 401 || response.status === 403) {
+                signedIn = false;
                 pendingFormat = format;
+                username = registryValue;
+                password = '';
                 loginOpen = true;
                 loginMessage = '';
                 return;
@@ -133,6 +147,7 @@
                 loginMessage = result.message || 'Sign-in failed.';
                 return;
             }
+            signedIn = true;
             loginOpen = false;
             password = '';
             await downloadTranscript(pendingFormat);
@@ -326,8 +341,10 @@
 
                     <div class="record-actions">
                         <div>
-                            <p class="eyebrow">RESTRICTED DOWNLOAD</p>
-                            <p class="document-name">Sign-in required</p>
+                            <p class="eyebrow">{signedIn ? 'SIGNED IN' : 'RESTRICTED DOWNLOAD'}</p>
+                            <p class:document-name--signed-in={signedIn} class="document-name">
+                                {signedIn ? `Signed in as ${profile.registry}` : 'Sign-in required'}
+                            </p>
                         </div>
                         <div class="download-options">
                             <button class="download-button" type="button" on:click={() => downloadTranscript('pdf')}>
@@ -361,7 +378,7 @@
                     <h2 id="login-title">Sign in to download</h2>
                     <form on:submit={signIn}>
                         <label for="login-username">Username</label>
-                        <input id="login-username" bind:value={username} autocomplete="username" required />
+                        <input id="login-username" bind:value={username} autocomplete="username" readonly required />
                         <label for="login-password">Password</label>
                         <input id="login-password" type="password" bind:value={password} autocomplete="current-password" required />
                         {#if loginMessage}
