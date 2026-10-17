@@ -215,6 +215,25 @@ async function handleRequest(request, response) {
         return;
     }
 
+    if (url.pathname === '/api/logout' && request.method === 'POST') {
+        const cookies = String(request.headers.cookie || '').split(';');
+        const cookie = cookies.find((value) => value.trim().startsWith('transcript_session='));
+        if (cookie) {
+            const token = cookie.trim().slice('transcript_session='.length);
+            sessions.delete(token);
+        }
+
+        const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+        response.writeHead(200, {
+            'Cache-Control': 'no-store',
+            'Set-Cookie': `transcript_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0${secure}`,
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Content-Type-Options': 'nosniff'
+        });
+        response.end(JSON.stringify({ signedOut: true }));
+        return;
+    }
+
     if (url.pathname === '/api/transcript' && request.method === 'GET') {
         const session = getSession(request);
         if (!session) {

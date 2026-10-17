@@ -158,6 +158,20 @@
         }
     }
 
+    async function signOut() {
+        try {
+            const response = await fetch('/api/logout', { method: 'POST' });
+            if (!response.ok) {
+                throw new Error('Sign-out failed');
+            }
+            signedIn = false;
+            password = '';
+            downloadMessage = '';
+        } catch (error) {
+            downloadMessage = 'Could not sign out. Please try again.';
+        }
+    }
+
     function stopScanner() {
         scanning = false;
         if (scanFrame) {
@@ -353,6 +367,9 @@
                             <button class="download-button download-button--outline" type="button" on:click={() => downloadTranscript('xlsx')}>
                                 Excel <span aria-hidden="true">↓</span>
                             </button>
+                            {#if signedIn}
+                                <button class="signout-button" type="button" on:click={signOut}>Sign out</button>
+                            {/if}
                         </div>
                     </div>
                     {#if downloadMessage}

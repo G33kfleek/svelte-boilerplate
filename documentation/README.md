@@ -1,30 +1,22 @@
-<img src="./demo.png" alt="Pankod - docusaurus-boilerplate" align="center" />
+# Academic Transcripts Documentation
 
-This website was created with [Docusaurus](https://docusaurus.io/).
+This folder contains the documentation site for the Academic Transcripts verifier.
 
-# What's In This Document
+## Run the documentation site
 
-* [Get Started in 5 Minutes](#get-started-in-5-minutes)
-
-# Get Started in 5 Minutes
-
-1. Go to the website folder:
+Install its dependencies and start the local site:
 
 ```sh
-# Go to the folder
-$ cd website
+cd website
+npm install
+npm start
 ```
 
-2. Make sure all the dependencies for the website are installed:
+The Docusaurus development server serves the documentation locally.
+
+## Build
 
 ```sh
-# Install dependencies
-$ npm i
-```
-
-3. Run your dev server:
-
-```sh
-# Start the site
-$ npm start
+cd website
+npm run build
 ```
