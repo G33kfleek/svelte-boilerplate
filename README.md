@@ -103,6 +103,37 @@ After answering question it generates component, style and test files in milisec
 <br/>
 
 
+## Transcript verification
+
+The verification page reads `src/Assets/documents/TRANSCRIPTS.pdf.xlsx` on the server. A valid register number must match both a worksheet name and the register value in that worksheet. The profile is returned as a read-only table; the source workbook is not sent to the browser. PDF and per-student Excel downloads require a successful sign-in.
+
+For a QR code that opens from a phone camera or another QR app, encode the full public URL as `/verify/<register-number>`, for example `https://your-domain/verify/TB10/SR/MN/5777/2015`. The page reads the number from that path, fills the lookup, and starts verification automatically. Plain register-number QR payloads can also be read with the page's camera scanner.
+
+Install dependencies and build the app:
+
+```sh
+npm install
+npm run build
+```
+
+Configure the download login using environment variables, then start the server:
+
+```sh
+TRANSCRIPT_USERNAME=registrar TRANSCRIPT_PASSWORD='replace-with-a-secret' NODE_ENV=production npm start
+```
+
+For local development, run the API and frontend in separate terminals. The API listens on port 3001 and the webpack dev server proxies `/api` requests to it on port 3000:
+
+```sh
+TRANSCRIPT_USERNAME=registrar TRANSCRIPT_PASSWORD='replace-with-a-secret' npm start
+```
+
+```sh
+npm run start:dev
+```
+
+Keep the login credentials in deployment secrets, never in the repository. The register profile is visible to anyone who knows its register number; sign-in protects transcript downloads only.
+
 ## License
 
 Licensed under the MIT License, Copyright © 2019-present Pankod

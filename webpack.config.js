@@ -28,6 +28,7 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/public',
+		publicPath: '/',
 		filename: '[name].js',
 		chunkFilename: '[name].[id].js'
 	},
@@ -71,7 +72,7 @@ module.exports = {
 				]
 			},
 			{
-				test: /\.(png|jpe?g|gif|mp4|svg|ttf)$/,
+				test: /\.(png|jpe?g|gif|mp4|svg|ttf|xlsx|pdf)$/,
 				use: [
 					{
 						loader: 'file-loader'
@@ -89,12 +90,16 @@ module.exports = {
 			inlineSource: isInline ? '.(js|css)$' : '',
 			hash: isInline ? false : true,
 			template: './src/index.html',
-			title: 'svelte-boilerplate'
+			title: 'Academic Transcripts'
 		}),
 		new HtmlWebpackInlineSourcePlugin()
 	],
 	devtool: prod ? false : 'source-map',
 	devServer: {
-		port: 3000
+		port: 3000,
+		historyApiFallback: true,
+		proxy: {
+			'/api': 'http://localhost:3001'
+		}
 	}
 };

@@ -1,20 +1,651 @@
-.container {
-  background-color: #2c3e50;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 100%;
-  justify-content: flex-start;
-  align-items: center;
-  min-height: 100vh;
+$ink: #202b29;
+$muted: #69736f;
+$line: #d9dfda;
+$red: #9b2d2b;
+$red-dark: #7d2221;
+$paper: #f5f6f2;
+$white: #fff;
+$yellow: #e0b52b;
+$yellow-dark: #846000;
 
-  &__top {
-    margin: 100px;
+:global(body) {
+  color: $ink;
+  background: $paper;
+  font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.verification-page {
+  min-height: 100vh;
+  padding: 0 7.2vw;
+  background-color: $paper;
+  background-image: repeating-linear-gradient(0deg, rgba(32, 43, 41, 0.018) 0, rgba(32, 43, 41, 0.018) 1px, transparent 1px, transparent 5px);
+}
+
+.masthead,
+.wordmark,
+.page-heading,
+.lookup-panel__topline,
+.record-heading,
+.record-actions,
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.masthead {
+  height: 78px;
+  border-bottom: 1px solid $line;
+}
+
+.wordmark {
+  justify-content: flex-start;
+  gap: 12px;
+  color: $ink;
+  text-decoration: none;
+}
+
+.wordmark__seal {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid $red;
+  color: $red;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.wordmark__text {
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-size: 18px;
+}
+
+.masthead__label,
+.eyebrow,
+.section-index,
+.record-reference span,
+.empty-record__number,
+.page-footer {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+}
+
+.masthead__label {
+  color: $muted;
+}
+
+.masthead__label span,
+.page-heading__note span,
+.empty-record__number span,
+.page-footer i {
+  color: $yellow;
+  font-style: normal;
+}
+
+.page-heading {
+  align-items: flex-end;
+  padding: 66px 0 43px;
+}
+
+.eyebrow {
+  margin-bottom: 11px;
+  color: $red;
+}
+
+.page-heading h1,
+.record-heading h2,
+.empty-record h2 {
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.page-heading h1 {
+  font-size: 38px;
+  line-height: 1.15;
+}
+
+.page-heading__note {
+  padding-bottom: 5px;
+  color: $muted;
+  font-size: 12px;
+}
+
+.verification-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.7fr);
+  min-height: 430px;
+  border-top: 1px solid $ink;
+  border-bottom: 1px solid $ink;
+}
+
+.lookup-panel {
+  padding: 28px 34px 26px 0;
+  border-right: 1px solid $line;
+}
+
+.lookup-panel__topline {
+  justify-content: flex-start;
+  gap: 14px;
+  margin-bottom: 43px;
+}
+
+.section-index {
+  color: $yellow-dark;
+}
+
+.lookup-panel__topline h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lookup-panel label {
+  display: block;
+  margin-bottom: 9px;
+  color: $muted;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.registry-input {
+  display: flex;
+  height: 45px;
+  border: 1px solid #aeb8b1;
+  background: $white;
+}
+
+.registry-input:focus-within {
+  border-color: $red;
+  outline: 2px solid rgba(39, 99, 78, 0.16);
+}
+
+.registry-input input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 11px;
+  border: 0;
+  outline: 0;
+  color: $ink;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.registry-input input::placeholder {
+  color: #9aa39d;
+}
+
+.search-button {
+  flex: 0 0 44px;
+  border: 0;
+  border-left: 1px solid $line;
+  color: $white;
+  background: $red;
+  cursor: pointer;
+  font-size: 19px;
+}
+
+.scan-button,
+.stop-button {
+  width: 100%;
+  height: 42px;
+  margin-top: 12px;
+  border: 1px solid #aeb8b1;
+  color: $ink;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.scan-button:hover:not(:disabled),
+.stop-button:hover {
+  border-color: $red;
+  color: $red;
+}
+
+.scan-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.scanner-video {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  margin-top: 15px;
+  background: #14221d;
+  object-fit: cover;
+}
+
+.stop-button {
+  margin-top: 7px;
+}
+
+.form-message {
+  margin-top: 14px;
+  color: $muted;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.form-message--error {
+  color: $red;
+}
+
+.lookup-panel__footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 39px;
+  color: $muted;
+  font-size: 10px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $red;
+}
+
+.record-panel {
+  padding: 28px 0 25px 42px;
+}
+
+.record-heading {
+  margin-bottom: 24px;
+}
+
+.record-heading .eyebrow {
+  margin-bottom: 7px;
+}
+
+.record-heading h2,
+.empty-record h2 {
+  font-size: 25px;
+}
+
+.verified-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: $red;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.verified-mark span {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  color: $white;
+  background: $red;
+  font-size: 12px;
+}
+
+.record-reference {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid $line;
+  border-bottom: 1px solid $line;
+}
+
+.record-reference__details {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.record-reference__details > span {
+  color: $muted;
+}
+
+.record-reference__details strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.record-reference__route {
+  color: $red;
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.record-reference__route:hover {
+  text-decoration: underline;
+}
+
+.verification-qr {
+  display: flex;
+  flex: 0 0 82px;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: $muted;
+  font-size: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.verification-qr img {
+  display: block;
+  width: 76px;
+  height: 76px;
+  border: 1px solid $line;
+  background: $white;
+  image-rendering: pixelated;
+}
+
+.profile-table-wrap {
+  overflow-x: auto;
+}
+
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.profile-table tr {
+  border-bottom: 1px solid $line;
+}
+
+.profile-table th,
+.profile-table td {
+  padding: 11px 12px 11px 0;
+  vertical-align: top;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.profile-table th {
+  width: 39%;
+  color: $muted;
+  font-weight: 500;
+}
+
+.profile-table td {
+  color: $ink;
+  font-weight: 600;
+}
+
+.record-actions {
+  gap: 16px;
+  padding-top: 21px;
+}
+
+.download-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.record-actions .eyebrow {
+  margin-bottom: 6px;
+  font-size: 9px;
+}
+
+.document-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.download-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 14px;
+  border: 0;
+  color: $white;
+  background: $red;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.download-button:hover {
+  background: $red-dark;
+}
+
+.download-button span {
+  font-size: 16px;
+}
+
+.download-button--outline {
+  border: 1px solid $red;
+  color: $red;
+  background: transparent;
+}
+
+.download-button--outline:hover {
+  color: $white;
+  background: $red;
+}
+
+.download-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.verification-note {
+  margin-top: 18px;
+  color: $muted;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.empty-record {
+  display: flex;
+  min-height: 375px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.empty-record__number {
+  margin-bottom: 19px;
+  color: $muted;
+}
+
+.empty-record__rule {
+  width: 38px;
+  height: 2px;
+  margin-bottom: 22px;
+  background: $yellow;
+}
+
+.empty-record h2 {
+  margin-bottom: 8px;
+}
+
+.empty-record p {
+  color: $muted;
+  font-size: 12px;
+}
+
+.page-footer {
+  min-height: 64px;
+  color: $muted;
+  font-size: 9px;
+}
+
+.login-backdrop {
+  position: fixed;
+  z-index: 5;
+  inset: 0;
+  display: grid;
+  padding: 18px;
+  place-items: center;
+  background: rgba(20, 32, 28, 0.58);
+}
+
+.login-dialog {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 37px;
+  border-top: 3px solid $red;
+  background: $white;
+  box-shadow: 0 18px 60px rgba(17, 34, 27, 0.22);
+}
+
+.login-dialog h2 {
+  margin-bottom: 25px;
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.login-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  color: $muted;
+  background: transparent;
+  cursor: pointer;
+  font-size: 23px;
+}
+
+.login-dialog label {
+  display: block;
+  margin: 16px 0 7px;
+  color: $muted;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.login-dialog input {
+  width: 100%;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid #aeb8b1;
+  color: $ink;
+  background: $white;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.login-dialog input:focus {
+  border-color: $red;
+  outline: 2px solid rgba(39, 99, 78, 0.16);
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 22px;
+}
+
+@media (max-width: 720px) {
+  .verification-page {
+    padding: 0 22px;
   }
 
-  &__middle {
-    display: flex;
-    flex: 1 1 100%;
-    justify-content: center;
+  .masthead {
+    height: 66px;
+  }
+
+  .masthead__label {
+    max-width: 120px;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  .page-heading {
+    display: block;
+    padding: 48px 0 29px;
+  }
+
+  .page-heading h1 {
+    font-size: 32px;
+  }
+
+  .page-heading__note {
+    margin-top: 15px;
+  }
+
+  .verification-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lookup-panel {
+    padding: 23px 0 24px;
+    border-right: 0;
+    border-bottom: 1px solid $line;
+  }
+
+  .lookup-panel__topline {
+    margin-bottom: 25px;
+  }
+
+  .lookup-panel__footnote {
+    margin-top: 22px;
+  }
+
+  .record-panel {
+    padding: 28px 0 25px;
+  }
+
+  .empty-record {
+    min-height: 210px;
+  }
+
+  .page-footer {
+    gap: 12px;
+    font-size: 8px;
+  }
+
+  .page-footer span:last-child {
+    text-align: right;
+  }
+}
+
+@media (max-width: 420px) {
+  .verification-page {
+    padding: 0 16px;
+  }
+
+  .wordmark__text {
+    font-size: 16px;
+  }
+
+  .masthead__label {
+    max-width: 102px;
+    font-size: 8px;
+  }
+
+  .record-reference {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .record-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .login-dialog {
+    padding: 33px 24px 26px;
   }
 }
